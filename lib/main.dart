@@ -6,7 +6,7 @@ void main() {
 }
 
 // Exercise 4: Closure Counter
-Function createCounter() {
+int Function() createCounter() {
   int count = 0;
 
   return () {
@@ -15,7 +15,7 @@ Function createCounter() {
   };
 }
 
-// Exercise 5: Filter prices
+// Exercise 5: Filter Prices
 List<double> filterPrices(List<double> prices, double limit) {
   return prices.where((price) => price > limit).toList();
 }
@@ -49,8 +49,7 @@ class ExercisePage extends StatefulWidget {
 }
 
 class _ExercisePageState extends State<ExercisePage> {
-
-  // Exercise 1
+  // Exercise 1: Product Information
   final String productName = 'Laptop';
   final double productPrice = 45000000;
   final int productCount = 2;
@@ -61,7 +60,7 @@ class _ExercisePageState extends State<ExercisePage> {
 
   bool showProduct = false;
 
-  // Exercise 2
+  // Exercise 2: Discount Calculator
   final TextEditingController priceController =
       TextEditingController(text: '2000000');
 
@@ -74,8 +73,13 @@ class _ExercisePageState extends State<ExercisePage> {
     final price = double.tryParse(priceController.text);
     final discount = double.tryParse(discountController.text);
 
-    if (price == null || discount == null ||
-        price < 0 || discount < 0 || discount > 100) {
+    if (price == null ||
+        discount == null ||
+        !price.isFinite ||
+        !discount.isFinite ||
+        price < 0 ||
+        discount < 0 ||
+        discount > 100) {
       setState(() {
         discountResult = 'Please enter valid values.';
       });
@@ -92,7 +96,7 @@ class _ExercisePageState extends State<ExercisePage> {
     });
   }
 
-  // Exercise 3
+  // Exercise 3: Shopping List
   final List<String> shoppingList = ['Milk', 'Bread', 'Eggs'];
 
   final TextEditingController itemController =
@@ -124,8 +128,9 @@ class _ExercisePageState extends State<ExercisePage> {
     });
   }
 
-  // Exercise 4
-  late final counter = createCounter();
+  // Exercise 4: Counter Using Closure
+  late final int Function() counter = createCounter();
+
   int counterValue = 0;
 
   void increaseCounter() {
@@ -134,7 +139,7 @@ class _ExercisePageState extends State<ExercisePage> {
     });
   }
 
-  // Exercise 5
+  // Exercise 5: Price Filter
   final List<double> prices = [
     10000,
     25000,
@@ -153,7 +158,7 @@ class _ExercisePageState extends State<ExercisePage> {
   void filterAndCalculate() {
     final limit = double.tryParse(limitController.text);
 
-    if (limit == null || limit < 0) {
+    if (limit == null || !limit.isFinite || limit < 0) {
       setState(() {
         priceMessage = 'Enter a valid price limit.';
         filteredPrices = [];
@@ -172,6 +177,7 @@ class _ExercisePageState extends State<ExercisePage> {
     });
   }
 
+  // Reusable Section Title
   Widget sectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -186,17 +192,19 @@ class _ExercisePageState extends State<ExercisePage> {
     );
   }
 
+  // Reusable Input Field
   Widget inputField(
     String label,
-    TextEditingController controller,
-  ) {
+    TextEditingController controller, {
+    bool numeric = true,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextField(
         controller: controller,
-        keyboardType: const TextInputType.numberWithOptions(
-          decimal: true,
-        ),
+        keyboardType: numeric
+            ? const TextInputType.numberWithOptions(decimal: true)
+            : TextInputType.text,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
@@ -205,6 +213,7 @@ class _ExercisePageState extends State<ExercisePage> {
     );
   }
 
+  // Reusable Result Card
   Widget resultCard(Widget child) {
     return Card(
       child: Padding(
@@ -231,11 +240,9 @@ class _ExercisePageState extends State<ExercisePage> {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-
           // Exercise 1
           sectionTitle('Exercise 1: Product Information'),
 
@@ -254,7 +261,9 @@ class _ExercisePageState extends State<ExercisePage> {
                     });
                   },
                   child: Text(
-                    showProduct ? 'Hide Information' : 'Show Information',
+                    showProduct
+                        ? 'Hide Information'
+                        : 'Show Information',
                   ),
                 ),
                 if (showProduct) ...[
@@ -317,7 +326,11 @@ class _ExercisePageState extends State<ExercisePage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                inputField('New Shopping Item', itemController),
+                inputField(
+                  'New Shopping Item',
+                  itemController,
+                  numeric: false,
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -445,6 +458,11 @@ class _ExercisePageState extends State<ExercisePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
       ),
     );
   }
